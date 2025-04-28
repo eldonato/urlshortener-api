@@ -1,5 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using UrlShortener.Infra;
+using UrlShortener.Infra.Cache;
+using UrlShortener.Infra.Repositories;
 
 namespace UrlShortener.Configuracoes;
 
@@ -7,6 +9,17 @@ public static class ConfiguracoesDePersistencia
 {
     public static void ConfigurarPersistencias(
         this IServiceCollection services,
+        ConfigurationManager configuracao
+    )
+    {
+        ConfigurarConexoes(services, configuracao);
+
+        services.AddScoped<IRepositorioDeUrlEncurtada, RepositorioDeUrlEncurtada>();
+        services.AddScoped<IServicoDeCache, ServicoDeCacheRedis>();
+    }
+
+    private static void ConfigurarConexoes(
+        IServiceCollection services,
         ConfigurationManager configuracao
     )
     {
