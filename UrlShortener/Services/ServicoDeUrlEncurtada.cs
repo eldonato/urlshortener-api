@@ -18,6 +18,7 @@ public class ServicoDeUrlEncurtada(
         if (UrlInvalida(urlOriginal))
         {
             logger.LogWarning("Url informada inválida: {Url}", urlOriginal);
+            return null;
         }
 
         string urlCurta;

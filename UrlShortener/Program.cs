@@ -9,6 +9,8 @@ builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 
+builder.Services.ConfigurarCors();
+
 builder.Services.ConfigurarPersistencias(builder.Configuration);
 
 builder.Services.ConfigurarServicos();
@@ -25,7 +27,9 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
+app.UseCors();
+
+// app.UseHttpsRedirection();
 
 app.UseAuthorization();
 
