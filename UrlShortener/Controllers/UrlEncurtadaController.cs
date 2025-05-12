@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Primitives;
 using UrlShortener.Services;
 
 namespace UrlShortener.Controllers;
