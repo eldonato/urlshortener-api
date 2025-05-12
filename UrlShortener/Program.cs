@@ -1,4 +1,6 @@
+using Microsoft.EntityFrameworkCore;
 using UrlShortener.Configuracoes;
+using UrlShortener.Infra;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -28,6 +30,25 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseCors();
+
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    try
+    {
+        var dbContext = services.GetRequiredService<ApplicationDbContext>(); // Exemplo, substitua pelo seu DbContext
+
+        Console.WriteLine("Attempting to apply migrations...");
+        dbContext.Database.Migrate();
+        Console.WriteLine("Migrations applied successfully or already up-to-date.");
+    }
+    catch (Exception ex)
+    {
+        var logger = services.GetRequiredService<ILogger<Program>>();
+        logger.LogError(ex, "An error occurred while applying migrations.");
+        throw;
+    }
+}
 
 // app.UseHttpsRedirection();
 
