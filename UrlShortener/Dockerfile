@@ -1,18 +1,22 @@
-FROM mcr.microsoft.com/dotnet/sdk:9.0 as build
+FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
+WORKDIR /src
 
-WORKDIR /app
+COPY UrlShortener.sln .
 
-COPY *.csproj ./
-RUN dotnet restore
+RUN mkdir UrlShortener
+COPY UrlShortener/*.csproj ./UrlShortener/
 
-COPY . .
+RUN dotnet restore UrlShortener.sln
 
-RUN dotnet publish -c Release -o out
+COPY UrlShortener/. ./UrlShortener/
 
-FROM mcr.microsoft.com/dotnet/aspnet:9.0 as runtime
+WORKDIR /src/UrlShortener
 
+RUN dotnet publish UrlShortener.csproj -c Release -o /app/out
+
+FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS runtime
 WORKDIR /app
 
 COPY --from=build /app/out .
 
-ENTRYPOINT [ "dotnet", "UrlShortener.dll" ]
+ENTRYPOINT ["dotnet", "UrlShortener.dll"]
