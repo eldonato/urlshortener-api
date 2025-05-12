@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Primitives;
 using UrlShortener.Services;
 
 namespace UrlShortener.Controllers;
@@ -52,6 +53,13 @@ public class UrlEncurtadaController(
         }
 
         logger.LogInformation("Tentando encurtar '{urlOriginal}'", urlOriginal);
+
+        var baseUrl = string.Empty;
+        if(Request.Headers.ContainsKey("Origin")) {
+            baseUrl = Request.Headers["Origin"];
+            logger.LogInformation("Url vinda de {url}", baseUrl);
+        }
+
         var urlCurta = await servico.CriarUrlEncurtada(urlOriginal);
 
         if (urlCurta == null)
@@ -63,6 +71,8 @@ public class UrlEncurtadaController(
             );
         }
 
-        return Ok(urlCurta);
+        var urlCompleta = $"{baseUrl}/{urlCurta}";
+
+        return Ok(urlCompleta);
     }
 }
