@@ -6,11 +6,12 @@ namespace UrlShortener.Controllers;
 [ApiController]
 [Route("/api/v1/[controller]")]
 public class UrlEncurtadaController(
+    IConfiguration configuracao,
     IServicoDeUrlEncurtada servico,
     ILogger<UrlEncurtadaController> logger
 ) : ControllerBase
 {
-    [HttpGet("{urlCurta}")]
+    [HttpGet("/{urlCurta}")]
     [ProducesResponseType(StatusCodes.Status302Found)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -27,8 +28,9 @@ public class UrlEncurtadaController(
 
         if (string.IsNullOrEmpty(urlOriginal))
         {
+            var frontendBaseUrl = configuracao.GetValue<string>("FrontendSettings:BaseUrl")!;
             logger.LogWarning("Url curta {urlCurta} não encontrada", urlCurta);
-            return NotFound("A URL curta não foi encontrada");
+            return Redirect(frontendBaseUrl);
         }
 
         logger.LogInformation(
@@ -36,7 +38,7 @@ public class UrlEncurtadaController(
             urlCurta,
             urlOriginal
         );
-        return Ok(urlOriginal);
+        return Redirect(urlOriginal);
     }
 
     [HttpPost("Encurtar")]
@@ -53,11 +55,9 @@ public class UrlEncurtadaController(
 
         logger.LogInformation("Tentando encurtar '{urlOriginal}'", urlOriginal);
 
-        var baseUrl = string.Empty;
-        if(Request.Headers.ContainsKey("Origin")) {
-            baseUrl = Request.Headers["Origin"];
-            logger.LogInformation("Url vinda de {url}", baseUrl);
-        }
+        var request = HttpContext.Request;
+
+        var baseUrl = $"{request.Scheme}://{request.Host}";
 
         var urlCurta = await servico.CriarUrlEncurtada(urlOriginal);
 

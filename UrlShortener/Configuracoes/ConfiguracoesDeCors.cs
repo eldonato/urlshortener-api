@@ -2,17 +2,24 @@ namespace UrlShortener.Configuracoes;
 
 public static class ConfiguracoesDeCors
 {
-    public static void ConfigurarCors(this IServiceCollection services)
+    public static void ConfigurarCors(this WebApplicationBuilder builder)
     {
-        services.AddCors(options =>
+        var frontendBaseUrl = builder.Configuration.GetValue<string>("FrontendSettings:BaseUrl");
+        var allowedOrigins = builder
+            .Configuration.GetSection("FrontendSettings:AllowedOrigins")
+            .Get<string[]>();
+
+        var validAllowedOrigins = allowedOrigins?.Where(o => !string.IsNullOrEmpty(o)).ToArray();
+
+        if (validAllowedOrigins?.Length > 0)
         {
-            options.AddDefaultPolicy(builder =>
+            builder.Services.AddCors(options =>
             {
-                builder
-                    .WithOrigins("http://localhost:3000", "http://127.0.0.1:3000", "https://urlshortener-app-a7f8.onrender.com")
-                    .AllowAnyHeader()
-                    .AllowAnyMethod();
+                options.AddDefaultPolicy(policy =>
+                {
+                    policy.WithOrigins("").AllowAnyHeader().AllowAnyMethod();
+                });
             });
-        });
+        }
     }
 }
