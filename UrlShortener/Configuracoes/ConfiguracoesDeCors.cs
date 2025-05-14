@@ -17,7 +17,7 @@ public static class ConfiguracoesDeCors
             {
                 options.AddDefaultPolicy(policy =>
                 {
-                    policy.WithOrigins("").AllowAnyHeader().AllowAnyMethod();
+                    policy.WithOrigins(validAllowedOrigins).AllowAnyHeader().AllowAnyMethod();
                 });
             });
         }
