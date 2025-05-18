@@ -27,6 +27,11 @@ if (app.Environment.IsDevelopment())
     app.MapOpenApi();
     app.UseSwagger();
     app.UseSwaggerUI();
+    app.UseCors("AnyOrigin");
+}
+else
+{
+    app.UseCors("WithOrigin");
 }
 
 app.UseCors();
@@ -36,7 +41,7 @@ using (var scope = app.Services.CreateScope())
     var services = scope.ServiceProvider;
     try
     {
-        var dbContext = services.GetRequiredService<ApplicationDbContext>(); // Exemplo, substitua pelo seu DbContext
+        var dbContext = services.GetRequiredService<ApplicationDbContext>();
 
         Console.WriteLine("Attempting to apply migrations...");
         dbContext.Database.Migrate();
